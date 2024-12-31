@@ -5,7 +5,7 @@ module.exports = {
   name: "vision",
   description: "Vision Ai",
   role: 1,
-  author: "heru",
+  author: "Kaizenji",
 
   async execute(chilli, pogi, kalamansi, event) {
     const kalamansiPrompt = pogi.join(" ").trim();
@@ -23,17 +23,19 @@ module.exports = {
         imageUrl = event.message.attachments[0].payload.url;
       }
 
-      const apiUrl = `https://api.joshweb.click/gemini`;
+      const apiUrl = `https://kaiz-apis.gleeze.com/api/gemini-vision`;
 
       const chilliResponse = await handleImageRecognition(apiUrl, kalamansiPrompt, imageUrl);
-      const result = chilliResponse.gemini;
+      const result = chilliResponse.response;
 
-      const visionResponse = `📷 𝗩𝗜𝗦𝗜𝗢𝗡 𝗔𝗡𝗔𝗟𝗬𝗭\n━━━━━━━━━━━━━━━━━━\n${result}`;
+      const visionResponse = `📷 𝗩𝗜𝗦𝗜𝗢𝗡 𝗔𝗡𝗔𝗟𝗬𝗭
+━━━━━━━━━━━━━━━━━━
+${result}`;
 
       sendLongMessage(chilli, visionResponse, kalamansi);
 
     } catch (error) {
-      console.error("Error in Gemini command:", error);
+      console.error("Error in Vision command:", error);
       sendMessage(chilli, { text: `Error: ${error.message || "Something went wrong."}` }, kalamansi);
     }
   }
@@ -42,8 +44,9 @@ module.exports = {
 async function handleImageRecognition(apiUrl, prompt, imageUrl) {
   const { data } = await axios.get(apiUrl, {
     params: {
-      prompt,
-      url: imageUrl || ""
+      q: prompt,
+      uid: "",
+      imageUrl: imageUrl || ""
     }
   });
 
