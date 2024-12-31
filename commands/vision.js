@@ -60,14 +60,20 @@ async function getRepliedImage(mid, kalamansi) {
       params: { access_token: kalamansi }
     });
 
+    console.log("Replied image data:", JSON.stringify(data, null, 2));
+
     if (data && data.data.length > 0 && data.data[0].image_data) {
+      console.log("Image URL found:", data.data[0].image_data.url);
       return data.data[0].image_data.url;
+    } else {
+      console.log("No image data found in the reply.");
     }
   } catch (error) {
     console.error("Error fetching replied image:", error);
   }
   return "";
 }
+
 
 function sendLongMessage(chilli, text, kalamansi) {
   const maxMessageLength = 2000;
