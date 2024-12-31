@@ -23,7 +23,7 @@ fs.readdirSync(path.join(__dirname, '../commands'))
   });
 
 // Internal API endpoints
-const INTERNAL_API_BASE = 'https://fixed-db-autopagebot.onrender.com'; //put your own database url here
+const INTERNAL_API_BASE = 'https://fixed-db-autopage-bot2.onrender.com'; //put your own database url here
 const ENDPOINT_FIND = `${INTERNAL_API_BASE}/find?json=`;
 
 /**
