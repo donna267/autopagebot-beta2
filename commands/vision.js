@@ -9,14 +9,10 @@ module.exports = {
 
   async execute(chilli, pogi, kalamansi, event) {
     const kalamansiPrompt = pogi.join(" ").trim();
-    const userId = event.senderId; // Use senderId for uid
+    const userId = event.senderId || "12"; // Default uid to "12"
 
     if (!kalamansiPrompt) {
       return sendMessage(chilli, { text: `Please enter your question or image to describe.` }, kalamansi);
-    }
-
-    if (!userId) {
-      return sendMessage(chilli, { text: `Error: User ID (senderId) is required for this command.` }, kalamansi);
     }
 
     try {
