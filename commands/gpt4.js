@@ -2,7 +2,7 @@ const axios = require('axios');
 const { sendMessage } = require('../handles/sendMessage');
 
 module.exports = {
-  name: 'gpt4',
+  name: 'ai',
   description: 'Interact with the GPT-4 model to receive AI-generated responses.',
   usage: '-gpt4 [your question]',
   author: 'Jerome',
@@ -13,12 +13,12 @@ module.exports = {
       return sendMessage(senderId, { text: '🤖 Please provide a question for GPT-4 (e.g., "-gpt4 What is the weather today?").' }, pageAccessToken);
     }
 
-    const apiUrl = `https://api.kenliejugarap.com/freegpt-openai/?question=${encodeURIComponent(question)}`;
+    const apiUrl = `https://chat-gpt-master33.onrender.com/api/hercai?question=${encodeURIComponent(question)}`;
 
     try {
       const response = await axios.get(apiUrl);
       if (response.data.status) {
-        const reply = response.data.response;
+        const reply = response.data.reply;
 
         // Split the reply into chunks of 2000 characters or less
         const chunkSize = 2000;
