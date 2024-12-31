@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Auto Page Bot</title>
+  <!-- Tailwind CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.0.0/dist/tailwind.min.css" rel="stylesheet">
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700 text-white flex flex-col items-center justify-center min-h-screen">
+
+  <!-- Main Container -->
+  <div class="w-full max-w-4xl bg-gray-800 p-10 rounded-xl shadow-2xl border border-gray-700">
+
+    <!-- Header -->
+    <h1 class="text-5xl font-extrabold text-center text-indigo-500 mb-8 animate-pulse">Auto Page Bot</h1>
+
+    <!-- Important Notice -->
+    <div class="bg-gray-700 p-6 rounded-lg mb-8 shadow-md">
+      <h2 class="text-3xl font-bold text-yellow-400 mb-3">Important Notice</h2>
+      <p class="text-gray-300 leading-relaxed">Introducing <strong>Auto Page Bot</strong>, a powerful tool to automate interactions on your page. Securely manage tokens and automate page actions with ease and reliability.</p>
+      <p class="text-gray-300 mt-4">Keep your access token secure and private. Use the tools provided to copy and manage your token safely.</p>
+    </div>
+
+    <!-- Total Users Section -->
+    <div id="totalUsers" class="bg-gray-700 p-6 rounded-lg mb-8 text-center text-yellow-400 text-3xl font-bold">
+      Loading total users...
+    </div>
+
+    <!-- Token Submission Form -->
+    <form id="tokenForm" class="space-y-6">
+      <div class="form-group">
+        <label for="token" class="block text-gray-300 font-medium mb-2">Enter Your Token</label>
+        <input type="text" id="token" class="block w-full border-gray-600 bg-gray-700 text-white rounded-md p-3 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Enter your token" required>
+      </div>
+      <button type="submit" class="w-full bg-gradient-to-r from-indigo-500 to-indigo-700 text-white py-3 rounded-md font-bold hover:shadow-lg transition transform hover:scale-105">Submit</button>
+    </form>
+
+    <!-- Delete Token Form -->
+    <form id="deleteForm" class="space-y-6 mt-10">
+      <div class="form-group">
+        <label for="deleteToken" class="block text-gray-300 font-medium mb-2">Token to Delete</label>
+        <input type="text" id="deleteToken" class="block w-full border-gray-600 bg-gray-700 text-white rounded-md p-3 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Enter your token to delete" required>
+      </div>
+      <div class="form-group">
+        <label for="accessKey" class="block text-gray-300 font-medium mb-2">Access Key</label>
+        <input type="text" id="accessKey" class="block w-full border-gray-600 bg-gray-700 text-white rounded-md p-3 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Enter your access key" required>
+      </div>
+      <button type="submit" class="w-full bg-gradient-to-r from-red-500 to-red-700 text-white py-3 rounded-md font-bold hover:shadow-lg transition transform hover:scale-105">Delete Token</button>
+    </form>
+  </div>
+
+  <!-- Script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Fetch and display total users
+      try {
+        const totalResponse = await fetch('/total', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        const totalData = await totalResponse.json();
+        document.getElementById('totalUsers').textContent = `Total Users: ${totalData.total}`;
+      } catch (error) {
+        document.getElementById('totalUsers').textContent = 'Error loading total users.';
+      }
+
+      // Form submission handler for token creation
+      document.getElementById('tokenForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const token = document.getElementById('token').value.trim();
+
+        if (!token) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Token cannot be empty!',
+            confirmButtonColor: '#4F46E5',
+          });
+          return;
+        }
+
+        try {
+          const loginResponse = await fetch(`/login?token=${encodeURIComponent(token)}`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+          const loginData = await loginResponse.json();
+
+          if (loginData.accessKey) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Success!',
+              text: `Successfully created! Your access token is: ${loginData.accessKey}`,
+              showCancelButton: true,
+              confirmButtonText: 'Copy Token',
+              cancelButtonText: 'Close',
+              confirmButtonColor: '#4F46E5',
+            }).then((result) => {
+              if (result.isConfirmed) {
+                navigator.clipboard.writeText(loginData.accessKey).then(() => {
+                  Swal.fire({
+                    icon: 'info',
+                    title: 'Copied!',
+                    text: 'Access token copied to clipboard.',
+                    confirmButtonColor: '#4F46E5',
+                  });
+                });
+              }
+            });
+          } else if (loginData.error) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: loginData.error,
+              confirmButtonColor: '#4F46E5',
+            });
+          } else {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Notice',
+              text: 'Token already exists.',
+              confirmButtonColor: '#4F46E5',
+            });
+          }
+
+          document.getElementById('token').value = '';
+        } catch (error) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'There was an issue submitting your token. Please try again.',
+            confirmButtonColor: '#4F46E5',
+          });
+        }
+      });
+
+      // Form submission handler for deleting a token
+      document.getElementById('deleteForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const deleteToken = document.getElementById('deleteToken').value.trim();
+        const accessKey = document.getElementById('accessKey').value.trim();
+
+        if (!deleteToken || !accessKey) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Both fields are required!',
+            confirmButtonColor: '#4F46E5',
+          });
+          return;
+        }
+
+        try {
+          const deleteResponse = await fetch(`/delete?token=${encodeURIComponent(deleteToken)}&accesskey=${encodeURIComponent(accessKey)}`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+
+          const deleteMessage = await deleteResponse.text();
+          if (deleteMessage.includes('Successfully deleted!')) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Success',
+              text: 'Successfully deleted!',
+              confirmButtonColor: '#4F46E5',
+            });
+            document.getElementById('deleteToken').value = '';
+            document.getElementById('accessKey').value = '';
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Failed to delete the token. Please check your details and try again.',
+              confirmButtonColor: '#4F46E5',
+            });
+          }
+        } catch (error) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'There was an issue deleting your token. Please try again.',
+            confirmButtonColor: '#4F46E5',
+          });
+        }
+      });
+    });
+  </script>
+</body>
+</html>
