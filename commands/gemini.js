@@ -8,7 +8,7 @@ const imageFilePath = path.join(__dirname, '../data/image.json');
 
 module.exports = {
   name: 'gemini',
-  description: 'Interact with Google Gemini for image recognition or text responses.',
+  description: 'Interact with Gemini Vision API for image recognition or text responses.',
   usage: 'gemini [your message] or send an image for recognition',
   author: 'coffee',
 
@@ -22,8 +22,10 @@ module.exports = {
       // If there is an image URL and a user-provided query, use the "vision" endpoint for recognition
       const imgUrl = imageData[senderId];
       try {
-        const visionResponse = await axios.get(`https://jerome-web.onrender.com/service/api/gemini?ask=${encodeURIComponent(prompt)}&imgurl=${encodeURIComponent(imgUrl)}`);
-        
+        const visionResponse = await axios.get(
+          `https://kaiz-apis.gleeze.com/api/gemini-vision?q=${encodeURIComponent(prompt)}&uid=123656&imageUrl=${encodeURIComponent(imgUrl)}`
+        );
+
         if (visionResponse.data && visionResponse.data.vision) {
           // Send the vision response to the user
           await sendMessage(senderId, { text: visionResponse.data.vision }, pageAccessToken);
@@ -42,8 +44,10 @@ module.exports = {
     } else if (!imageData[senderId] && prompt) {
       // If there is no image URL stored, proceed with the text-only response
       try {
-        const textResponse = await axios.get(`https://jerome-web.onrender.com/service/api/gemini?ask=${encodeURIComponent(prompt)}&imgurl=`);
-        
+        const textResponse = await axios.get(
+          `https://kaiz-apis.gleeze.com/api/gemini-vision?q=${encodeURIComponent(prompt)}&uid=123656&imageUrl=`
+        );
+
         if (textResponse.data && textResponse.data.textResponse) {
           // Send the text response to the user
           await sendMessage(senderId, { text: textResponse.data.textResponse }, pageAccessToken);
