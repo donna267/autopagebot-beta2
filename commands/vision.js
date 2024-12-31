@@ -21,8 +21,14 @@ module.exports = {
       // Check for image attachments or replied images
       if (event.message?.reply_to?.mid) {
         imageUrl = await getRepliedImage(event.message.reply_to.mid, kalamansi);
+        console.log("Replied Image URL:", imageUrl); // Debugging the replied image URL
       } else if (event.message?.attachments && event.message.attachments[0]?.type === 'image') {
         imageUrl = event.message.attachments[0].payload.url;
+        console.log("Direct Image URL:", imageUrl); // Debugging the direct image URL
+      }
+
+      if (!imageUrl) {
+        return sendMessage(chilli, { text: `No image found to analyze.` }, kalamansi);
       }
 
       // Make API request
@@ -42,15 +48,19 @@ module.exports = {
 };
 
 async function handleImageRecognition(apiUrl, prompt, uid, imageUrl) {
-  const { data } = await axios.get(apiUrl, {
-    params: {
-      q: prompt,
-      uid,
-      imageUrl: imageUrl || ""
-    }
-  });
-
-  return data;
+  try {
+    const { data } = await axios.get(apiUrl, {
+      params: {
+        q: prompt,
+        uid,
+        imageUrl: imageUrl || ""
+      }
+    });
+    return data;
+  } catch (error) {
+    console.error("Error in Image Recognition API:", error);
+    throw new Error("Failed to recognize the image.");
+  }
 }
 
 async function getRepliedImage(mid, kalamansi) {
@@ -59,6 +69,8 @@ async function getRepliedImage(mid, kalamansi) {
       params: { access_token: kalamansi }
     });
 
+    console.log("Replied Image Data:", data); // Debugging the entire response from Graph API
+    
     if (data?.data?.[0]?.image_data?.url) {
       return data.data[0].image_data.url;
     }
