@@ -2,7 +2,7 @@ const axios = require('axios');
 const { sendMessage } = require('../handles/sendMessage');
 
 module.exports = {
-  name: 'ai',
+  name: 'hercai',
   description: 'Interact with the GPT-4 model to receive AI-generated responses.',
   usage: '-gpt4 [your question]',
   author: 'Jerome',
@@ -12,7 +12,7 @@ module.exports = {
     if (!question) {
       return sendMessage(
         senderId,
-        { text: '🤖 Please provide a question for GPT-4 (e.g., "-gpt4 What is the weather today?").' },
+        { text: '🤖 Please provide a question for GPT-4 (e.g., "-hercai What is the weather today?").' },
         pageAccessToken
       );
     }
