@@ -26,9 +26,9 @@ module.exports = {
           `https://kaiz-apis.gleeze.com/api/gemini-vision?q=${encodeURIComponent(prompt)}&uid=123656&imageUrl=${encodeURIComponent(imgUrl)}`
         );
 
-        if (visionResponse.data && visionResponse.data.vision) {
+        if (visionResponse.data && visionResponse.data.response) {
           // Send the vision response to the user
-          await sendMessage(senderId, { text: visionResponse.data.vision }, pageAccessToken);
+          await sendMessage(senderId, { text: visionResponse.data.response }, pageAccessToken);
         } else {
           await sendMessage(senderId, { text: 'Failed to recognize the image. Please try again later.' }, pageAccessToken);
         }
@@ -48,9 +48,9 @@ module.exports = {
           `https://kaiz-apis.gleeze.com/api/gemini-vision?q=${encodeURIComponent(prompt)}&uid=123656&imageUrl=`
         );
 
-        if (textResponse.data && textResponse.data.textResponse) {
+        if (textResponse.data && textResponse.data.response) {
           // Send the text response to the user
-          await sendMessage(senderId, { text: textResponse.data.textResponse }, pageAccessToken);
+          await sendMessage(senderId, { text: textResponse.data.response }, pageAccessToken);
         } else {
           await sendMessage(senderId, { text: 'Failed to generate a response. Please try again later.' }, pageAccessToken);
         }
