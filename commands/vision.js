@@ -23,7 +23,7 @@ module.exports = {
         imageUrl = event.message.attachments[0].payload.url;
       }
 
-      const apiUrl = `https://joshweb.click/gemini`;
+      const apiUrl = `https://api.joshweb.click/gemini`;
 
       const chilliResponse = await handleImageRecognition(apiUrl, kalamansiPrompt, imageUrl);
       const result = chilliResponse.gemini;
