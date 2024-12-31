@@ -17,11 +17,14 @@ module.exports = {
     try {
       let imageUrl = "";
 
-      if (event.message.reply_to && event.message.reply_to.mid) {
+      if (event.message?.reply_to?.mid) {
         imageUrl = await getRepliedImage(event.message.reply_to.mid, kalamansi);
-      } 
-      else if (event.message?.attachments && event.message.attachments[0]?.type === 'image') {
+      } else if (event.message?.attachments && event.message.attachments[0]?.type === 'image') {
         imageUrl = event.message.attachments[0].payload.url;
+      }
+
+      if (!imageUrl) {
+        return sendMessage(chilli, { text: `No image found to analyze. Please reply to an image or attach one.` }, kalamansi);
       }
 
       const apiUrl = `https://api.joshweb.click/gemini`;
@@ -52,15 +55,18 @@ async function handleImageRecognition(apiUrl, prompt, imageUrl) {
 }
 
 async function getRepliedImage(mid, kalamansi) {
-  const { data } = await axios.get(`https://graph.facebook.com/v21.0/${mid}/attachments`, {
-    params: { access_token: kalamansi }
-  });
+  try {
+    const { data } = await axios.get(`https://graph.facebook.com/v21.0/${mid}/attachments`, {
+      params: { access_token: kalamansi }
+    });
 
-  if (data && data.data.length > 0 && data.data[0].image_data) {
-    return data.data[0].image_data.url;
-  } else {
-    return "";
+    if (data && data.data.length > 0 && data.data[0].image_data) {
+      return data.data[0].image_data.url;
+    }
+  } catch (error) {
+    console.error("Error fetching replied image:", error);
   }
+  return "";
 }
 
 function sendLongMessage(chilli, text, kalamansi) {
@@ -82,5 +88,4 @@ function sendLongMessage(chilli, text, kalamansi) {
 function splitMessageIntoChunks(message, chunkSize) {
   const regex = new RegExp(`.{1,${chunkSize}}`, 'g');
   return message.match(regex);
-      }
-                                   
+}
