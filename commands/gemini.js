@@ -21,10 +21,20 @@ module.exports = {
     if (imageData[senderId] && prompt) {
       // If there is an image URL and a user-provided query, use the "vision" endpoint for recognition
       const imgUrl = imageData[senderId];
+
+      // Check if the image URL is valid
+      if (!imgUrl || !imgUrl.startsWith('http')) {
+        console.error('Invalid image URL:', imgUrl);
+        await sendMessage(senderId, { text: 'The stored image URL is invalid. Please send a valid image.' }, pageAccessToken);
+        return;
+      }
+
       try {
         const visionResponse = await axios.get(
           `https://kaiz-apis.gleeze.com/api/gemini-vision?q=${encodeURIComponent(prompt)}&uid=123656&imageUrl=${encodeURIComponent(imgUrl)}`
         );
+
+        console.log('API Response:', visionResponse.data); // Log the full response for debugging
 
         if (visionResponse.data && visionResponse.data.response) {
           // Send the vision response to the user
@@ -47,6 +57,8 @@ module.exports = {
         const textResponse = await axios.get(
           `https://kaiz-apis.gleeze.com/api/gemini-vision?q=${encodeURIComponent(prompt)}&uid=123656&imageUrl=`
         );
+
+        console.log('API Response (Text-only):', textResponse.data); // Log the full response for debugging
 
         if (textResponse.data && textResponse.data.response) {
           // Send the text response to the user
