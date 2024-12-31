@@ -16,6 +16,11 @@ module.exports = {
 
     try {
       let imageUrl = "";
+      let userId = event.senderID || ""; // Use sender ID as uid
+
+      if (!userId) {
+        return sendMessage(chilli, { text: `Error: User ID is required for this command.` }, kalamansi);
+      }
 
       if (event.message?.reply_to?.mid) {
         imageUrl = await getRepliedImage(event.message.reply_to.mid, kalamansi);
@@ -25,12 +30,10 @@ module.exports = {
 
       const apiUrl = `https://kaiz-apis.gleeze.com/api/gemini-vision`;
 
-      const chilliResponse = await handleImageRecognition(apiUrl, kalamansiPrompt, imageUrl);
+      const chilliResponse = await handleImageRecognition(apiUrl, kalamansiPrompt, userId, imageUrl);
       const result = chilliResponse.response;
 
-      const visionResponse = `📷 𝗩𝗜𝗦𝗜𝗢𝗡 𝗔𝗡𝗔𝗟𝗬𝗭
-━━━━━━━━━━━━━━━━━━
-${result}`;
+      const visionResponse = `📷 𝗩𝗜𝗦𝗜𝗢𝗡 𝗔𝗡𝗔𝗟𝗬𝗭\n━━━━━━━━━━━━━━━━━━\n${result}`;
 
       sendLongMessage(chilli, visionResponse, kalamansi);
 
@@ -41,11 +44,11 @@ ${result}`;
   }
 };
 
-async function handleImageRecognition(apiUrl, prompt, imageUrl) {
+async function handleImageRecognition(apiUrl, prompt, uid, imageUrl) {
   const { data } = await axios.get(apiUrl, {
     params: {
       q: prompt,
-      uid: "",
+      uid,
       imageUrl: imageUrl || ""
     }
   });
