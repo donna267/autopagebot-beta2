@@ -18,7 +18,7 @@ module.exports = {
     try {
       let imageUrl = "";
 
-      // Check for image attachments or replied images
+      // Check for replied image or direct image attachment
       if (event.message?.reply_to?.mid) {
         imageUrl = await getRepliedImage(event.message.reply_to.mid, kalamansi);
         console.log("Replied Image URL:", imageUrl); // Debugging the replied image URL
@@ -71,8 +71,8 @@ async function getRepliedImage(mid, kalamansi) {
 
     console.log("Replied Image Data:", data); // Debugging the entire response from Graph API
     
-    if (data?.data?.[0]?.image_data?.url) {
-      return data.data[0].image_data.url;
+    if (data?.data?.[0]?.media?.image?.src) {
+      return data.data[0].media.image.src; // Correcting the path to image URL
     }
     return "";
   } catch (error) {
