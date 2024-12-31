@@ -3,38 +3,39 @@ const { sendMessage } = require('../handles/sendMessage');
 
 module.exports = {
   name: "vision",
-  description: "Vision Ai",
+  description: "Vision AI",
   role: 1,
   author: "Kaizenji",
 
   async execute(chilli, pogi, kalamansi, event) {
     const kalamansiPrompt = pogi.join(" ").trim();
+    const userId = event.senderId; // Use senderId for uid
 
     if (!kalamansiPrompt) {
       return sendMessage(chilli, { text: `Please enter your question or image to describe.` }, kalamansi);
     }
 
+    if (!userId) {
+      return sendMessage(chilli, { text: `Error: User ID (senderId) is required for this command.` }, kalamansi);
+    }
+
     try {
       let imageUrl = "";
-      let userId = event.senderID || ""; // Use sender ID as uid
 
-      if (!userId) {
-        return sendMessage(chilli, { text: `Error: User ID is required for this command.` }, kalamansi);
-      }
-
+      // Check for image attachments or replied images
       if (event.message?.reply_to?.mid) {
         imageUrl = await getRepliedImage(event.message.reply_to.mid, kalamansi);
       } else if (event.message?.attachments && event.message.attachments[0]?.type === 'image') {
         imageUrl = event.message.attachments[0].payload.url;
       }
 
+      // Make API request
       const apiUrl = `https://kaiz-apis.gleeze.com/api/gemini-vision`;
-
       const chilliResponse = await handleImageRecognition(apiUrl, kalamansiPrompt, userId, imageUrl);
+
+      // Process and send response
       const result = chilliResponse.response;
-
       const visionResponse = `📷 𝗩𝗜𝗦𝗜𝗢𝗡 𝗔𝗡𝗔𝗟𝗬𝗭\n━━━━━━━━━━━━━━━━━━\n${result}`;
-
       sendLongMessage(chilli, visionResponse, kalamansi);
 
     } catch (error) {
