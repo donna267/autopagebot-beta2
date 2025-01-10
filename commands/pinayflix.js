@@ -27,7 +27,7 @@ module.exports = {
         }, pageAccessToken);
       }
 
-      const maxVideos = 10; // Limit the number of videos to send
+      const maxVideos = 2; // Limit the number of videos to send
       const videos = data.slice(0, maxVideos);
 
       for (const video of videos) {
