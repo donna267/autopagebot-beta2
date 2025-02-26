@@ -23,7 +23,7 @@ module.exports = {
       const response = await axios.get(apiUrl);
 
       if (response.data && response.data.reply) {
-        const reply = response.data.response;
+        const reply = response.data.reply;
 
         // Split the reply into chunks of 2000 characters or less
         const chunkSize = 2000;
